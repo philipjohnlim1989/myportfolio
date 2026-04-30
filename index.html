@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philip John Lim - Document Controller | Construction Projects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --construction-orange: #FF6B35;
+            --safety-yellow: #FFD23F;
+            --engineering-blue: #4A90E2;
+            --steel-gray: #2C3E50;
+            --dark-steel: #1A1A2E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, var(--dark-steel) 0%, var(--steel-gray) 50%, #0f3460 100%);
+            color: #ffffff;
+            line-height: 1.7;
+        }
+
+        /* Intro Loader Styles */
+        .intro-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark-steel) 0%, var(--steel-gray) 70%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+
+        .intro-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 107, 53, 0.1) 2px,
+                    rgba(255, 107, 53, 0.1) 4px
+                );
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .logo-container {
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .intro-main-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--safety-yellow), var(--construction-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            animation: glow 2s ease-in-out infinite alternate;
+            transition: all 0.5s ease;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px var(--construction-orange);
+            }
+            to {
+                text-shadow: 0 0 30px var(--safety-yellow), 0 0 40px var(--construction-orange);
+            }
+        }
+
+        .loading-dots {
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .loading-dots span {
+            display: inline-block;
+            animation: dotPulse 2s infinite ease-in-out both;
+        }
+
+        .dot1 { animation-delay: -0.64s; }
+        .dot2 { animation-delay: -0.32s; }
+        .dot3 { animation-delay: 0s; }
+
+        @keyframes dotPulse {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .intro-subtitle {
+            font-size: 1.3rem;
+            color: #e5e5e5;
+            margin-top: 1rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            transition: all 0.5s ease;
+        }
+
+        .intro-loader .progress-bar {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--construction-orange), var(--safety-yellow));
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 10px var(--construction-orange);
+        }
+
+        /* Construction Grid Background */
+        .construction-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Floating Construction Elements */
+        .construction-floaters {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .floater {
+            position: absolute;
+            opacity: 0.1;
+            animation: floatConstruction 20s infinite linear;
+        }
+
+        @keyframes floatConstruction {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        /* Navigation - CENTERED */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 4px solid var(--construction-orange);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center; /* CHANGED: Center alignment */
+            align-items: center;
+            gap: 3rem; /* Added gap between logo and nav */
+        }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--safety-yellow), var(--construction-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            flex-shrink: 0; /* Prevent logo from shrinking */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid transparent;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            background: var(--construction-orange);
+            border-color: var(--safety-yellow);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Mobile Responsive Navigation */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 0;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 5%;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .profile-photo {
+            width: 280px;
+            height: 280px;
+            border-radius: 20px;
+            border: 6px solid var(--construction-orange);
+            background: linear-gradient(135deg, var(--steel-gray), var(--dark-steel));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            box-shadow:
+                0 0 0 1px var(--safety-yellow),
+                0 25px 50px rgba(255, 107, 53, 0.4);
+            animation: photoPulse 3s ease-in-out infinite alternate;
+        }
+        .profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 14px;
+}
+
+        .profile-photo::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            background: conic-gradient(var(--construction-orange), var(--safety-yellow), var(--engineering-blue));
+            border-radius: 28px;
+            z-index: -1;
+            animation: rotateFrame 12s linear infinite;
+        }
+
+        @keyframes photoPulse {
+            0% { box-shadow: 0 0 0 1px var(--safety-yellow), 0 25px 50px rgba(255, 107, 53, 0.4); }
+            100% { box-shadow: 0 0 0 1px var(--safety-yellow), 0 35px 70px rgba(255, 107, 53, 0.6); }
+        }
+
+        @keyframes rotateFrame {
+            to { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--safety-yellow), white, var(--construction-orange));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            color: #e5e5e5;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--construction-orange), var(--safety-yellow));
+            color: var(--dark-steel);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 15px 35px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Sections */
+        .section {
+            padding: 8rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            background: linear-gradient(45deg, var(--safety-yellow), var(--construction-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--construction-orange), var(--safety-yellow));
+            border-radius: 2px;
+        }
+
+        /* About */
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 4rem;
+            margin-top: 3rem;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 210, 63, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-15px);
+            border-color: var(--safety-yellow);
+            box-shadow: 0 30px 60px rgba(255, 107, 53, 0.3);
+        }
+
+        .about-card h3 {
+            color: var(--safety-yellow);
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Skills */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-card {
+            background: rgba(74, 144, 226, 0.1);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 210, 63, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .skill-card:hover::before {
+            left: 100%;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-20px);
+            border-color: var(--construction-orange);
+            box-shadow: 0 25px 50px rgba(255, 107, 53, 0.4);
+        }
+
+        .skill-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--safety-yellow), var(--construction-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--safety-yellow), var(--construction-orange));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin: 4rem 0;
+            position: relative;
+        }
+
+        .timeline-content {
+            width: 45%;
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 210, 63, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content.left {
+            margin-right: 50%;
+        }
+
+        .timeline-content.right {
+            margin-left: 50%;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--construction-orange);
+            border: 4px solid white;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 2.5rem;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 0 0 0 4px var(--construction-orange);
+        }
+
+        .timeline-content h3 {
+            color: var(--safety-yellow);
+            font-family: 'Oswald', sans-serif;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Contact */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .contact-card {
+            background: rgba(255, 107, 53, 0.15);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 210, 63, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-15px);
+            border-color: var(--safety-yellow);
+            box-shadow: 0 25px 50px rgba(255, 107, 53, 0.4);
+        }
+
+        .contact-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--safety-yellow), var(--construction-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before { left: 30px; }
+            .timeline-item { flex-direction: column; }
+            .timeline-content {
+                width: 100%;
+                margin: 2rem 0 0 4rem !important;
+            }
+            .section { padding: 6rem 5%; }
+        }
+
+        /* Scroll Progress */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--construction-orange), var(--safety-yellow));
+            z-index: 1001;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro Loader -->
+    <div class="intro-loader" id="introLoader">
+        <div class="scan-lines"></div>
+        <div class="logo-container">
+            <div>
+                <h1 class="intro-main-text" id="introMainText">Processing</h1>
+                <div class="loading-dots" id="loadingDots">
+                    <span class="dot1">.</span><span class="dot2">.</span><span class="dot3">.</span>
+                </div>
+            </div>
+            <p class="intro-subtitle" id="introSubtitle">Initializing Document Control Systems</p>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="construction-grid"></div>
+    <div class="construction-floaters" id="floaters"></div>
+    <div class="progress-bar"></div>
+
+    <!-- Navigation - NOW CENTERED -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"></div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="profile-section">
+                <div class="profile-photo">
+    <img src="ppp.jpeg" alt="Philip John Lim - Document Controller" loading="eager">
+</div>
+                <div>
+                    <h1>Philip John Lim</h1>
+                    <p class="hero-subtitle">
+                        Document Controller | Aconex Specialist<br>
+                        Construction & Engineering Documentation
+                    </p>
+                    <div class="hero-badge">Ready for Next Project</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Professional Expertise</h2>
+        </div>
+        <div class="about-content">
+            <div class="about-card">
+                <h3><i class="fas fa-hard-hat"></i>Construction Specialist</h3>
+                <p>Experienced Document Controller managing documentation for high-scale and low-scale construction projects. Proven ability to maintain accurate, compliant systems in fast-paced environments.</p>
+            </div>
+            <div class="about-card">
+                <h3><i class="fas fa-file-alt"></i>Aconex Expert</h3>
+                <p>Mastery of Aconex for document control, transmittals, workflows, and correspondence. Proficient in Adobe Acrobat, MS Office, Dropbox for version control and secure distribution.</p>
+            </div>
+            <div class="about-card">
+                <h3><i class="fas fa-users"></i>Team Coordinator</h3>
+                <p>Excellent coordination with project teams, consultants, and contractors. Strong attention to detail supporting successful project delivery through organized document management.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Core Tools</h2>
+        </div>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="skill-icon"><i class="fas fa-project-diagram"></i></div>
+                <h3>Aconex</h3>
+                <p>Document control, transmittals, workflows, RFIs, correspondence</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Adobe Acrobat</h3>
+                <p>DC & XI - PDF editing, stamping, version control</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon"><i class="fas fa-table"></i></div>
+                <h3>MS Office</h3>
+                <p>Excel logs, Word documents, PowerPoint presentations</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon"><i class="fas fa-folder"></i></div>
+                <h3>Dropbox</h3>
+                <p>Secure sharing, organized folders, project backups</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience -->
+    <section id="experience" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Work History</h2>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content right">
+                    <h3>The Benz General Contracting</h3>
+                    <p><strong>Document Controller - Remote</strong><br>Jun 2025 - Present<br>Abu Dhabi, UAE</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content left">
+                    <h3>Arabian Company</h3>
+                    <p><strong>Document Controller - Hybrid</strong><br>Feb 2024 - Jun 2025<br>Abu Dhabi, UAE</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content right">
+                    <h3>OIL TECH Oil & Gas Services</h3>
+                    <p><strong>Document Controller - Remote</strong><br>Jan 2023 - Dec 2023<br>Abu Dhabi, UAE</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content left">
+                    <h3>Daeah Engineering & Construction</h3>
+                    <p><strong>Document Controller - Full-time</strong><br>Nov 2018 - Feb 2022<br>Philippines</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Contact Information</h2>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                <h3>Phone</h3>
+                <p>+971 50 712 8654</p>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <h3>Location</h3>
+                <p>Abu Dhabi, United Arab Emirates</p>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon"><i class="fas fa-university"></i></div>
+                <h3>Education</h3>
+                <p>Bachelor's in Information Technology<br>STI College (2009-2013)</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Intro Loader - 2 SECONDS PER PULSE
+        function initLoader() {
+            const loader = document.getElementById('introLoader');
+            const progressFill = document.getElementById('progressFill');
+            const mainText = document.getElementById('introMainText');
+            const subtitle = document.getElementById('introSubtitle');
+           
+            const phases = [
+                { text: 'Processing', subtitle: 'Initializing Document Control Systems', progress: 25 },
+                { text: 'Loading', subtitle: 'Setting Up Document Control Environment', progress: 50 },
+                { text: 'Verifying', subtitle: 'Validating and Indexing Project Files', progress: 75 },
+                { text: 'Complete', subtitle: 'Document Controller Ready', progress: 100 }
+            ];
+           
+            let phaseIndex = 0;
+           
+            const phaseInterval = setInterval(() => {
+                if (phaseIndex < phases.length) {
+                    const phase = phases[phaseIndex];
+                    mainText.textContent = phase.text;
+                    subtitle.textContent = phase.subtitle;
+                    progressFill.style.width = phase.progress + '%';
+                    phaseIndex++;
+                } else {
+                    clearInterval(phaseInterval);
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                    }, 1000);
+                }
+            }, 2000); // 2 seconds per pulse
+        }
+
+        // Construction floaters
+        function createFloaters() {
+            const container = document.getElementById('floaters');
+            const icons = ['⚒️', '🔩', '📐', '📋', '👷', '🏗️'];
+           
+            for (let i = 0; i < 15; i++) {
+                const floater = document.createElement('div');
+                floater.className = 'floater';
+                floater.textContent = icons[Math.floor(Math.random() * icons.length)];
+                floater.style.left = Math.random() * 100 + '%';
+                floater.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                floater.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                floater.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(floater);
+            }
+        }
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const progress = document.querySelector('.progress-bar:not(.intro-loader .progress-bar)');
+            const scroll = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            progress.style.width = scroll + '%';
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(26, 26, 46, 0.98)';
+                navbar.style.boxShadow = '0 5px 25px rgba(0,0,0,0.3)';
+            } else {
+                navbar.style.background = 'rgba(26, 26, 46, 0.95)';
+                navbar.style.boxShadow = '0 2px 15px rgba(0,0,0,0.2)';
+            }
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.about-card, .skill-card, .timeline-content, .contact-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            initLoader();
+            createFloaters();
+        });
+    </script>
+</body>
+</html>
